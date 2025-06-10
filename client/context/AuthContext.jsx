@@ -3,8 +3,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { io } from 'socket.io-client'
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL
-axios.defaults.baseURL = backendUrl
+axios.defaults.baseURL = "https://chatverse-backend-23d4.onrender.com";
 
 export const AuthContext = createContext()
 
