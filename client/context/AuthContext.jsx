@@ -67,11 +67,12 @@ export const AuthProvider = ({ children }) => {
   // Logout
   const logout = () => {
     localStorage.removeItem('token')
-    setToken(null)
+    
     setAuthUser(null)
     setOnlineUsers([])
-    axios.defaults.headers.common['Authorization'] 
- = null
+    delete axios.defaults.headers.common['Authorization'] 
+ 
+    setToken(null)
     if (socket) socket.disconnect()
     toast.success('Logged out successfully')
   }
@@ -79,7 +80,11 @@ export const AuthProvider = ({ children }) => {
   // Update profile
   const updateProfile = async (body) => {
     try {
-      const { data } = await axios.put('/api/auth/update-profile', body)
+      const { data } = await axios.put('/api/auth/update-profile', body,{
+  headers: {
+    'Content-Type': 'application/json',
+  }
+})
       if (data.success) {
         setAuthUser(data.user)
         toast.success('Profile updated successfully')

@@ -31,7 +31,10 @@ const Sidebar = () => {
     >
       <div className="pb-5">
         <div className="flex justify-between items-center">
+          <div className='flex justify-items-start'>
           <img src={assets.logo} alt="Logo" className="w-8 h-8" />
+          <p className='flex px-2 bg-gradient-to-r items-center from-blue-500 via-teal-500 to-pink-500 bg-clip-text text-3xl font-extrabold text-transparent text-center select-auto'>ChatVerse</p>
+          </div>
           <div className="relative py-2 group">
             <img src={assets.menu} alt="Menu" className="max-h-5 cursor-pointer" />
             <div className="absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#162456] border border-gray-600 text-gray-100 hidden group-hover:block">

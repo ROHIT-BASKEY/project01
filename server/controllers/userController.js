@@ -80,11 +80,6 @@ export const updateProfile = async (req, res) => {
 
     let updatedUser;
 
-    // if (!userId) {
-    //   return res.json({ success: false, message: 'Unauthorized access' });
-    // }
-
-
     if (!profilePic) {
       updatedUser = await User.findByIdAndUpdate(
         userId,

@@ -22,19 +22,19 @@ export const ChatProvider = ({children})=>{
                 setUnseenMessages(data.unseenMessages)
             }
         }catch(error){
-            toast.error(error.messages)
+            toast.error("failed to fetch user")
         }
     }
 
     //function to get message for selected user
     const getMessage = async(userId)=>{
         try{
-            await axios.get(`/api/messages/${userId}`)
+            const{data} = await axios.get(`/api/messages/${userId}`)
             if(data.success){
                 setMessages(data.messages)
             }
         } catch(error){
-            toast.error(error.message)
+            toast.error("failed to fetch message")
         }
     }
 
@@ -43,12 +43,12 @@ export const ChatProvider = ({children})=>{
         try {
             const {data} = await axios.post(`/api/messages/send/${selectedUser._id}`,messageData);
             if(data.success){
-                setMessages((prevMessages)=>[...prevMessages,data.newMessage]);
+                setMessages((prevMessages)=>[...prevMessages,data.newMessage])
             }else{
-                toast.error(data.message)
+                toast.error(data.message||"failed to send message")
             }
         } catch (error) {
-            toast.error(error.message)
+            toast.error(error.message ||"Error sending message")
         }
     }
 
@@ -58,7 +58,7 @@ export const ChatProvider = ({children})=>{
         socket.on("newMessage",(newMessage)=>{
             if(selectedUser && newMessage.senderId === selectedUser._id){
                 newMessage.seen = true;
-                setMessages((prevMessages)=>[...prevMessages,newMessage]);
+                setMessages((prevMessages)=>[...prevMessages,newMessage])
                 axios.put(`/api/messages/mark/${newMessage._id}`);
             }else{
                 setUnseenMessages((prevUnseenMessages)=>({

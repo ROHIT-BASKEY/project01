@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import assets from '../assets/assets.js'
 import { AuthContext } from '../../context/AuthContext.jsx'
+import toast from 'react-hot-toast'
 
 const LoginPage = () => {
   const [currState,setCurrState] = useState("Sign up")
@@ -9,12 +10,14 @@ const LoginPage = () => {
   const [password,setPassword] = useState("")
   const [bio,setBio] = useState("")
   const [isDataSubmitted,setIsDataSubmitted] = useState(false);
-
   const {login} = useContext(AuthContext)
-
+  const [agreeToPolicy,setAgreeToPolicy] = useState(false);
   const onSubmitHandler = (event)=>{
     event.preventDefault();
-
+    if(!agreeToPolicy){
+        toast.error("You must agree to the Terms of Use & Privacy Policy.");
+    return;
+    }
     if(currState === 'Sign up' && !isDataSubmitted){
       setIsDataSubmitted(true)
       return;
@@ -24,8 +27,28 @@ const LoginPage = () => {
   return (
     <div className='min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-2xl '>
       {/* left  */}
-      <img src={assets.logo_full} alt="" className='w-[min(30vw,250px)]'/>
+      <div className='flex flex-col items-center justify-center'>
+        <div className='flex'>
+          <span className="absolute mx-auto py-4 flex border w-fit bg-gradient-to-r blur-xl from-blue-500 via-teal-500 to-pink-500 bg-clip-text text-3xl box-content font-extrabold text-transparent text-center select-none">
+    Welcome to ChatVerse <span className="text-black dark:text-white ml-2">🚀</span>
+  </span>
+    <h1
+        className="relative top-0 w-fit h-auto py-4 justify-center flex bg-gradient-to-r items-center from-blue-500 via-teal-500 to-pink-500 bg-clip-text text-3xl font-extrabold text-transparent text-center select-auto">
+        Welcome to ChatVerse <span className="text-black dark:text-white ml-2">🚀</span>
+    </h1></div>
+        <div className='flex'>
+          <span className="absolute mx-auto py-4 flex border w-fit bg-gradient-to-r blur-xl from-blue-500 via-teal-500 to-pink-500 bg-clip-text text-3xl box-content font-extrabold text-transparent text-center select-none">
+    Connect. Chat. Share moments.
+  </span>
+    <h1
+        className="relative top-0 w-fit h-auto py-4 justify-center flex bg-gradient-to-r items-center from-blue-500 via-teal-500 to-pink-500 bg-clip-text text-3xl font-extrabold text-transparent text-center select-auto">
+        Connect. Chat. Share moments.
+    </h1></div>
+      
+      <img src={assets.logo_full} alt="" className='animate-bounce w-[min(30vw,250px)]'/>
 
+      </div>
+    
       {/* right  */}
       
       <form onSubmit={onSubmitHandler} className='border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg'>
@@ -52,7 +75,7 @@ const LoginPage = () => {
         {currState === "Sign up" ?"create Account" : "Login Now"}
       </button>
       <div>
-        <input type="checkbox"  />
+        <input type="checkbox"  checked={agreeToPolicy} onChange={(e)=>setAgreeToPolicy(e.target.checked)}/>
         <p>Agree to the terms of  ise & privacy policy</p>
       </div>
       <div className='flex flex-col gap-2' >

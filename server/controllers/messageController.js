@@ -10,23 +10,26 @@ export const getUsersForSidebar = async (req, res) => {
 
     const filteredUsers = await User.find({ _id: { $ne: userId } }).select("-password");
 
+//count no. of messages not seen
     const unseenMessages = {};
     const promises = filteredUsers.map(async (user) => {
       const messages = await Message.find({
         senderId: user._id,
-        recieverId: userId,
+        receiverId: userId,
         seen: false,
       });
+
       if (messages.length > 0) {
         unseenMessages[user._id] = messages.length;
       }
     });
 
     await Promise.all(promises);
-    res.json({ success: true, users: filteredUsers, unseenMessages });
+
+    res.json({success:true,users:filteredUsers,unseenMessages})
   } catch (error) {
-    console.log(error.message);
-    res.json({ success: false, message: error.message });
+    console.error("Sidebar Error:", error.message);
+    res.json({success:false,message:error.message})
   }
 };
 
@@ -38,43 +41,46 @@ export const getMessages = async (req, res) => {
 
     const messages = await Message.find({
       $or: [
-        { senderId: myId, recieverId: selectedUserId },
-        { senderId: selectedUserId, recieverId: myId },
+        { senderId: myId, receiverId: selectedUserId },
+        { senderId: selectedUserId, receiverId: myId }
       ],
-    });
+    }).sort({ createdAt: 1 }); // Optional: sort messages by time
 
     await Message.updateMany(
-      { senderId: selectedUserId, recieverId: myId },
+      { senderId: selectedUserId, receiverId: myId },
       { seen: true }
     );
 
     res.json({ success: true, messages });
   } catch (error) {
-    console.log(error.message);
+    console.error("Get Messages Error:", error.message);
     res.json({ success: false, message: error.message });
   }
 };
 
-// Mark message as seen using message ID
+
+// Mark specific message as seen using message ID
 export const markMessageAsSeen = async (req, res) => {
   try {
     const { id } = req.params;
     await Message.findByIdAndUpdate(id, { seen: true });
+
     res.json({ success: true });
   } catch (error) {
-    console.log(error.message);
+    console.log( error.message);
     res.json({ success: false, message: error.message });
   }
 };
 
-// Send message to selected user
+// Send a message (text/image) to selected user
 export const sendMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
-    const recieverId = req.params.id;
+    const receiverId = req.params.id;
     const senderId = req.user._id;
 
-    let imageUrl;
+    let imageUrl ;
+
     if (image) {
       const uploadResponse = await cloudnary.uploader.upload(image);
       imageUrl = uploadResponse.secure_url;
@@ -82,20 +88,20 @@ export const sendMessage = async (req, res) => {
 
     const newMessage = await Message.create({
       senderId,
-      recieverId,
+      receiverId,
       text,
       image: imageUrl,
     });
 
-    // Emit new message to the receiver's socket
-    const receiverSocketId = userSocketMap[recieverId];
+    // Emit new message via socket to receiver
+    const receiverSocketId = userSocketMap[receiverId];
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
     }
 
     res.json({ success: true, newMessage });
   } catch (error) {
-    console.log(error.message);
+    console.error("Send Message Error:", error.message);
     res.json({ success: false, message: error.message });
   }
 };
